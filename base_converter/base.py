@@ -31,12 +31,5 @@ class BaseConverter():
 
 
 decode = BaseConverter()
-print(decode.decode('what?'))
-print(decode.decode('YmFzZTY0'))
-print(decode.decode('626173653136'))
-print(decode.decode('MJQXGZJTGI======'))
-print(decode.decode('qzTiEHgB'))
-
-print(decode.encode('Hello!'))
 
 
