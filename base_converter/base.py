@@ -22,7 +22,7 @@ class BaseConverter():
 			try:
 				decodedb = self.decoderF[func](bytes(message, 'utf-8'))
 				decoded = str(decodedb, 'utf-8' )
-				return func + ' : ' + decoded
+				return 'Decoded with ' + func + ' : ' + decoded
 			except:
 				continue
 

@@ -26,4 +26,17 @@ async def encode(ctx, message=None):
 
 	return
 
+@bot.command()
+async def decode(ctx, message=None):
+	if not message:
+		await ctx.send('I can only decode what you give me...')
+		await ctx.send('```\nUsage: &decode [message]```')
+		return
+
+	decoder = BaseConverter()
+	decoded = decoder.decode(message)
+	await ctx.send('```\n{}\n```'.format(decoded))
+
+	return
+
 bot.run(token)
