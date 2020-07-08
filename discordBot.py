@@ -4,7 +4,7 @@ from discord.ext import commands
 from base_converter.base import BaseConverter
 
 token = open('token', 'r').read().strip()
-bot = commands.Bot(command_prefix='%')
+bot = commands.Bot(command_prefix='&')
 
 @bot.event
 async def on_ready():
