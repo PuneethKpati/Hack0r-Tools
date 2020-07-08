@@ -14,7 +14,7 @@ async def on_ready():
 async def encode(ctx, message=None):
 	if not message:
 		await ctx.send('Fam, what do you want me to encode?')
-		await ctx.send('```\nUsage: &encode message```')
+		await ctx.send('```\nUsage: &encode [message]```')
 
 	encoder = BaseConverter()
 	encoded = encoder.encode(message)
