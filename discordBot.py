@@ -1,10 +1,17 @@
 import discord
 from discord.ext import commands
 from base_converter.base import BaseConverter
+from server_listener.server_listener import Listener
+import asyncio
+import socket
+import multiprocessing
+import concurrent.futures
+import time
 
 # retrive the token stored in the same directory
 token = open('token', 'r').read().strip()
 bot = commands.Bot(command_prefix='&')
+
 
 # Signifies if the bot is ready 
 @bot.event
@@ -50,5 +57,46 @@ async def decode(ctx, message=None):
 	await ctx.send('```\n{}\n```'.format(decoded))
 
 	return
+
+async def test():
+	channel = bot.get_channel(734645148394192897)
+	for i in range(100):
+		print(i)
+		time.sleep(i)
+	
+@bot.command()
+async def nc(ctx, host, port):
+	# exception handling for host and port user input
+
+	# create the listener object with input and bot
+	listener = Listener(host, int(port), bot)
+	message = listener.oneRun()
+
+	m = """```
+	{}
+	```""".format(message)
+	await ctx.send(m)
+	
+	# call the server set up on a new process
+	# server will automatically start listening and send responses on discord
+	
+	print('Listening has started on new process')
+	return
+
+@bot.command()
+async def listen(ctx, host, port):
+	# exception handling for host and port user input
+
+	# create the listener object with input and bot
+	listener = Listener(host, int(port), bot)
+	# call the server set up on a new process
+	# server will automatically start listening and send responses on discord
+	new_loop = asyncio.new_event_loop()
+	listener_process = multiprocessing.Process(target=listener.setup, args=( new_loop,))
+	listener_process.start()
+	print('Listening has started on new process')
+	return
+
+
 
 bot.run(token)
