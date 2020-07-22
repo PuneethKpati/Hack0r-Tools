@@ -1,12 +1,8 @@
 import discord
 from discord.ext import commands
 from base_converter.base import BaseConverter
-from server_listener.server_listener import Listener
-import asyncio
+
 import socket
-import multiprocessing
-import concurrent.futures
-import time
 
 # retrive the token stored in the same directory
 token = open('token', 'r').read().strip()
@@ -66,16 +62,24 @@ async def listen(ctx, host, port):
 	if not str.isnumeric(port):
 		await ctx.send('Not a Correct Port Number')
 
+	# setup the socket configuration for an open TCP socket
 	listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 	listener.bind((host, int(port)))
 	listener.listen(5)
 	
+	# wait for a connection and then listen to the request sent
+	await ctx.send('```\n I am Listening on the host {} at port {} ```'.format(host, port))
 	clientsocket, addr = listener.accept()
 	m = clientsocket.recv(2048)
+
+	# decode the message from bytes to string
 	message = str(m, 'utf-8')
+
+	# send the message to a specified channel 
 	channel = bot.get_channel(734645148394192897)
-	await channel.send('```\n'+message+'```')
+	await channel.send('```\nHi, Someone tried to talk to me\n\n'+message+'```')
+
 	return
 
 
