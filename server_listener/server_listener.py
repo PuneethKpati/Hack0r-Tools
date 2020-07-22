@@ -19,6 +19,7 @@ class Listener:
 		self.listener.bind((self.host, self.port))
 		self.listener.listen(5)
 
+		
 		print('Server Active on {} and port {}'.format(self.host, self.port))
 
 		asyncio.set_event_loop(loop)
@@ -29,9 +30,15 @@ class Listener:
 			clientsocket, addr = await self.listener.accept()
 			m = clientsocket.recv(2048)
 			message = str(m, 'utf-8')
+			self.bot.dispatch('server_message', message)
 
 
 	def oneRun(self):
+		self.listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+		self.listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		self.listener.bind((self.host, self.port))
+		self.listener.listen(5)
 		clientsocket, addr = self.listener.accept()
 		m = clientsocket.recv(2048)
 		message = str(m, 'utf-8')

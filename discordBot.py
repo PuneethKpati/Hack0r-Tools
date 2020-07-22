@@ -18,6 +18,8 @@ bot = commands.Bot(command_prefix='&')
 async def on_ready():
 	print('Hack0r is ready...')
 
+
+
 # Command takes in message and encodes it through BaseConverter.encode
 # Prints the encoded messages in the same chat 
 @bot.command()
@@ -58,11 +60,10 @@ async def decode(ctx, message=None):
 
 	return
 
-async def test():
-	channel = bot.get_channel(734645148394192897)
-	for i in range(100):
-		print(i)
-		time.sleep(i)
+@bot.command()
+async def test(ctx):
+	bot.dispatch("server_message", 'm')
+	return
 	
 @bot.command()
 async def nc(ctx, host, port):
@@ -76,27 +77,58 @@ async def nc(ctx, host, port):
 	{}
 	```""".format(message)
 	await ctx.send(m)
-	
-	# call the server set up on a new process
-	# server will automatically start listening and send responses on discord
-	
-	print('Listening has started on new process')
+
 	return
+
+#===========================================================================================
 
 @bot.command()
 async def listen(ctx, host, port):
 	# exception handling for host and port user input
-
+	
 	# create the listener object with input and bot
-	listener = Listener(host, int(port), bot)
-	# call the server set up on a new process
-	# server will automatically start listening and send responses on discord
-	new_loop = asyncio.new_event_loop()
-	listener_process = multiprocessing.Process(target=listener.setup, args=( new_loop,))
-	listener_process.start()
-	print('Listening has started on new process')
+	# listener = Listener(host, int(port), bot)
+	# # call the server set up on a new process
+	# # server will automatically start listening and send responses on discord
+	# new_loop = asyncio.new_event_loop()
+	# listener_process = multiprocessing.Process(target=listener.setup, args=( new_loop,))
+	# listener_process.start()
+	# print('Listening has started on new process')
 	return
+#==============================================================================================
+def server_listen(listener):
+	clientsocket, addr = listener.accept()
+	m = clientsocket.recv(2048)
+	message = str(m, 'utf-8')
+	print(message)
+	bot.dispatch("server_message", message)
+
+@bot.command()
+async def listen2(ctx):
+	bot.dispatch("server_message", 'm')
+	listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+	listener.bind(('127.0.0.1', 12005))
+	listener.listen(5)
+	while True:
+		clientsocket, addr = await listener.accept()
+		m = clientsocket.recv(2048)
+		message = str(m, 'utf-8')
+		print(message)
+		
+	# listener_process = multiprocessing.Process(target=server_listen)
+	# listener_process.start()
+	return
+
+#===============================================================================================
+
+@bot.event
+async def on_server_message(message):
+	print('hjello')
+	channel = bot.get_channel(734645148394192897)
+	await channel.send(message)
 
 
 
 bot.run(token)
+ 
