@@ -61,72 +61,22 @@ async def decode(ctx, message=None):
 	return
 
 @bot.command()
-async def test(ctx):
-	bot.dispatch("server_message", 'm')
-	return
-	
-@bot.command()
-async def nc(ctx, host, port):
-	# exception handling for host and port user input
-
-	# create the listener object with input and bot
-	listener = Listener(host, int(port), bot)
-	message = listener.oneRun()
-
-	m = """```
-	{}
-	```""".format(message)
-	await ctx.send(m)
-
-	return
-
-#===========================================================================================
-
-@bot.command()
 async def listen(ctx, host, port):
 	# exception handling for host and port user input
+	if not str.isnumeric(port):
+		await ctx.send('Not a Correct Port Number')
+
+	listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+	listener.bind((host, int(port)))
+	listener.listen(5)
 	
-	# create the listener object with input and bot
-	# listener = Listener(host, int(port), bot)
-	# # call the server set up on a new process
-	# # server will automatically start listening and send responses on discord
-	# new_loop = asyncio.new_event_loop()
-	# listener_process = multiprocessing.Process(target=listener.setup, args=( new_loop,))
-	# listener_process.start()
-	# print('Listening has started on new process')
-	return
-#==============================================================================================
-def server_listen(listener):
 	clientsocket, addr = listener.accept()
 	m = clientsocket.recv(2048)
 	message = str(m, 'utf-8')
-	print(message)
-	bot.dispatch("server_message", message)
-
-@bot.command()
-async def listen2(ctx):
-	bot.dispatch("server_message", 'm')
-	listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-	listener.bind(('127.0.0.1', 12005))
-	listener.listen(5)
-	while True:
-		clientsocket, addr = await listener.accept()
-		m = clientsocket.recv(2048)
-		message = str(m, 'utf-8')
-		print(message)
-		
-	# listener_process = multiprocessing.Process(target=server_listen)
-	# listener_process.start()
-	return
-
-#===============================================================================================
-
-@bot.event
-async def on_server_message(message):
-	print('hjello')
 	channel = bot.get_channel(734645148394192897)
-	await channel.send(message)
+	await channel.send('```\n'+message+'```')
+	return
 
 
 
