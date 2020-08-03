@@ -3,7 +3,12 @@ from discord.ext import commands
 from base_converter.base import BaseConverter
 
 import socket
+import asyncio
+import websockets
+import nest_asyncio
+from aiohttp import web
 
+nest_asyncio.apply()
 # retrive the token stored in the same directory
 token = open('token', 'r').read().strip()
 bot = commands.Bot(command_prefix='&')
@@ -83,6 +88,35 @@ async def listen(ctx, host, port):
 	return
 
 
+@bot.command()
+async def listen2(ctx):
+	# Get a reference to the current event loop because
+	# we want to access low-level APIs.
+	loop = asyncio.get_event_loop()
+
+	# Register the open socket to wait for data.
+	reader, writer = await asyncio.open_connection(host='127.0.0.1', port=12034, loop=loop)
+
+	# Wait for data
+	data = await reader.read(100)
+
+	# Got data, we are done: close the socket
+	print("Received:", data.decode())
+	writer.close()
+
+	# Close the second socket
+	wsock.close()
+
+async def handler(request):
+	print(request)
+
+
+@bot.command()
+async def listen3(ctx):
+	app = web.Application()
+	app.router.add_get('/', handler)
+
+	await web.run_app(app, host='127.0.0.1', port='12034')
 
 bot.run(token)
  
